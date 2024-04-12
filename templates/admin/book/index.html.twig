@@ -1,0 +1,37 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block body %}
+    <a href="{{ path('admin_book_new') }}" class="btn btn-block btn-success my-3">
+        Create book
+    </a>
+
+    {% if books %}
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Year</th>
+                <th scope="col">ISBN</th>
+                <th scope="col">Actions</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for book in books %}
+                <tr>
+                    <td>{{ book.title }}</td>
+                    <td>{{ book.year }}</td>
+                    <td>{{ book.isbn }}</td>
+                    <td>
+                        <a href="{{ path('admin_book_edit', {id: book.id}) }}" class="btn btn-sm btn-primary">
+                            Edit
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <h1>No books yet</h1>
+    {% endif %}
+{% endblock %}
