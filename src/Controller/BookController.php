@@ -7,6 +7,7 @@ use App\Form\BookType;
 use App\Repository\BookRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,8 +18,10 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 #[Route('/book', 'admin_book_')]
 class BookController extends AbstractController
 {
-    function __construct(private EntityManagerInterface $entityManager)
-    {
+    function __construct(
+        private EntityManagerInterface $entityManager,
+        private SluggerInterface $slugger
+    ) {
     }
 
     #[Route('/', name: 'index')]
@@ -30,7 +33,7 @@ class BookController extends AbstractController
     }
 
     #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
-    public function new(Request $request, SluggerInterface $slugger): Response
+    public function new(Request $request): Response
     {
         $book = new Book();
 
@@ -42,21 +45,17 @@ class BookController extends AbstractController
             $coverImage = $form->get('coverImage')->getData();
 
             if ($coverImage) {
-                $originalFilename = pathinfo($coverImage->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename.'-'.uniqid().'.'.$coverImage->guessExtension();
+                $fileName = $this->uploadBookCover($coverImage);
 
-                try {
-                    $coverImage->move(
-                        $this->getParameter('book_covers_directory'),
-                        $newFilename
-                    );
-                } catch (FileException $e) {
-                    // ... handle exception if something happens during file upload
-                    throw $e;
+                if (false === $fileName) {
+                    $form->get('coverImage')->addError(new FormError('There was an error uploading image file.'));
+
+                    return $this->render('admin/book/new.html.twig', [
+                        'form' => $form,
+                    ]);
                 }
 
-                $book->setCoverFilename($newFilename);
+                $book->setCoverFilename($fileName);
             }
 
             $this->entityManager->persist($book);
@@ -71,7 +70,7 @@ class BookController extends AbstractController
     }
 
     #[Route('/{id<\d+>}/edit', name: 'edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, SluggerInterface $slugger, Book $book): Response
+    public function edit(Request $request, Book $book): Response
     {
         $form = $this->createForm(BookType::class, $book);
         $form->handleRequest($request);
@@ -81,21 +80,18 @@ class BookController extends AbstractController
             $coverImage = $form->get('coverImage')->getData();
 
             if ($coverImage) {
-                $originalFilename = pathinfo($coverImage->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename.'-'.uniqid().'.'.$coverImage->guessExtension();
+                $fileName = $this->uploadBookCover($coverImage);
 
-                try {
-                    $coverImage->move(
-                        $this->getParameter('book_covers_directory'),
-                        $newFilename
-                    );
-                } catch (FileException $e) {
-                    // ... handle exception if something happens during file upload
-                    throw $e;
+                if (false === $fileName) {
+                    $form->get('coverImage')->addError(new FormError('There was an error uploading image file.'));
+
+                    return $this->render('admin/book/edit.html.twig', [
+                        'book' => $book,
+                        'form' => $form,
+                    ]);
                 }
 
-                $book->setCoverFilename($newFilename);
+                $book->setCoverFilename($fileName);
             }
 
             $this->entityManager->persist($book);
@@ -117,5 +113,20 @@ class BookController extends AbstractController
         $this->entityManager->flush();
 
         return $this->redirectToRoute('admin_book_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    private function uploadBookCover(UploadedFile $coverImage): string|false
+    {
+        $originalFilename = pathinfo($coverImage->getClientOriginalName(), PATHINFO_FILENAME);
+        $safeFilename = $this->slugger->slug($originalFilename);
+        $newFilename = $safeFilename.'-'.uniqid().'.'.$coverImage->guessExtension();
+
+        try {
+            $coverImage->move($this->getParameter('book_covers_directory'), $newFilename);
+        } catch (FileException $e) {
+            return false;
+        }
+
+        return $newFilename;
     }
 }

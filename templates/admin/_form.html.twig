@@ -1,12 +1,13 @@
-{{ form_start(form) }}
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
 
 {{ form_widget(form) }}
 
 <button type="submit" class="btn btn-primary">
-    {{ button_label|default('Add author') }}
+    {{ submit_label|default('Create') }}
 </button>
 
-<a href="{{ path('admin_book_index') }}" class="btn btn-link">
-    Back to author list
+<a href="{{ back_url|default(path('admin_book_index')) }}" class="btn btn-link">
+    {{ back_label|default('Back to book list') }}
 </a>
+
 {{ form_end(form) }}
