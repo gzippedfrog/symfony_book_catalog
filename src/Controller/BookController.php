@@ -11,12 +11,15 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[Route('/book')]
+#[Route('/book', 'admin_book_')]
 class BookController extends AbstractController
 {
-    #[Route('/', name: 'admin_book_index')]
+    function __construct(private EntityManagerInterface $entityManager)
+    {
+    }
+
+    #[Route('/', name: 'index')]
     public function index(BookRepository $bookRepository): Response
     {
         return $this->render('admin/book/index.html.twig', [
@@ -24,36 +27,35 @@ class BookController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'admin_book_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
+    public function new(Request $request): Response
     {
         $book = new Book();
 
         $form = $this->createForm(BookType::class, $book);
-
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($book);
-            $entityManager->flush();
+            $this->entityManager->persist($book);
+            $this->entityManager->flush();
 
             return $this->redirectToRoute('admin_book_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('admin/book/new.html.twig', [
-            'book' => $book,
             'form' => $form,
         ]);
     }
 
-    #[Route('/{id<\d+>}/edit', name: 'admin_book_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Book $book, EntityManagerInterface $entityManager): Response
+    #[Route('/{id<\d+>}/edit', name: 'edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Book $book): Response
     {
         $form = $this->createForm(BookType::class, $book);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+            $this->entityManager->persist($book);
+            $this->entityManager->flush();
 
             return $this->redirectToRoute('admin_book_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -64,11 +66,11 @@ class BookController extends AbstractController
         ]);
     }
 
-    #[Route('/{id<\d+>}/delete', name: 'admin_book_delete', methods: ['POST'])]
-    public function delete(Request $request, Book $book, EntityManagerInterface $entityManager): Response
+    #[Route('/{id<\d+>}/delete', name: 'delete', methods: ['POST'])]
+    public function delete(Book $book): Response
     {
-        $entityManager->remove($book);
-        $entityManager->flush();
+        $this->entityManager->remove($book);
+        $this->entityManager->flush();
 
         return $this->redirectToRoute('admin_book_index', [], Response::HTTP_SEE_OTHER);
     }

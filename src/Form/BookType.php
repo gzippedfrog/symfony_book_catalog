@@ -2,7 +2,9 @@
 
 namespace App\Form;
 
+use App\Entity\Author;
 use App\Entity\Book;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -18,8 +20,12 @@ class BookType extends AbstractType
             ->add('isbn', TextType::class, [
                 'label' => 'ISBN',
             ])
-            ->add('authors')
-        ;
+            ->add('authors', EntityType::class, [
+                'class'        => Author::class,
+                'multiple'     => true,
+                'by_reference' => false,
+                'required'     => false,
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

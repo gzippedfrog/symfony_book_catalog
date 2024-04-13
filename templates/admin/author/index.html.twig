@@ -12,6 +12,7 @@
                 <th scope="col">First name</th>
                 <th scope="col">Last name</th>
                 <th scope="col">Patronymic</th>
+                <th scope="col">Books</th>
                 <th scope="col">Actions</th>
             </tr>
             </thead>
@@ -21,17 +22,18 @@
                 <tr>
                     <td>{{ author.firstName }}</td>
                     <td>{{ author.lastName }}</td>
-                    <td>{{ author.patronymic }}</td>
+                    <td>{{ author.patronymic ? author.patronymic : '-' }}</td>
+                    <td>{{ author.books.count > 0 ? author.books|join('; ') : '-' }}</td>
                     <td>
                         <div class="d-flex">
-                            {#                            <a href="{{ path('admin_author_edit', {id: author.id}) }}" class="btn btn-sm btn-primary"> #}
-                            {#                                Edit #}
-                            {#                            </a> #}
+                            <a href="{{ path('admin_author_edit', {id: author.id}) }}" class="btn btn-sm btn-primary">
+                                Edit
+                            </a>
 
-                            {#                            <form action="{{ url('admin_book_delete', {id: author.id}) }}" method="POST" class="ms-2"> #}
-                            {#                                <input type="hidden" name="token" value="{{ csrf_token('delete') }}"/> #}
-                            {#                                <button type="submit" class="btn btn-sm btn-danger">Delete</button> #}
-                            {#                            </form> #}
+                            <form action="{{ url('admin_author_delete', {id: author.id}) }}" method="POST" class="ms-2">
+                                <input type="hidden" name="token" value="{{ csrf_token('delete') }}"/>
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
                         </div>
                     </td>
                 </tr>

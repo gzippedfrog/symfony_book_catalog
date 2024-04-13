@@ -6,12 +6,13 @@
     </a>
 
     {% if books %}
-        <table class="table">
+        <table class="table align-middle">
             <thead>
             <tr>
                 <th scope="col">Title</th>
                 <th scope="col">Year</th>
                 <th scope="col">ISBN</th>
+                <th scope="col">Authors</th>
                 <th scope="col">Actions</th>
             </tr>
             </thead>
@@ -22,6 +23,7 @@
                     <td>{{ book.title }}</td>
                     <td>{{ book.year }}</td>
                     <td>{{ book.isbn }}</td>
+                    <td>{{ book.authors.count > 0 ? book.authors|join('; ') : '-' }}</td>
                     <td>
                         <div class="d-flex">
                             <a href="{{ path('admin_book_edit', {id: book.id}) }}" class="btn btn-sm btn-primary">

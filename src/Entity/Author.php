@@ -11,11 +11,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AuthorRepository::class)]
 #[ORM\UniqueConstraint(columns: ["first_name", "last_name", "patronymic"])]
-#[UniqueEntity(fields: [
-    "first_name",
-    "last_name",
-    "patronymic",
-], message: "Author with this first name, last name and patronymic combination already exist.")]
+#[UniqueEntity(
+    fields: ["firstName", "lastName", "patronymic"],
+    message: "Author with this first name, last name and patronymic combination already exist.",
+    ignoreNull: 'patronymic'
+)]
 class Author
 {
     #[ORM\Id]
@@ -128,14 +128,8 @@ class Author
         return $this;
     }
 
-    public function getFullName(): string
+    public function __toString(): string
     {
         return trim($this->firstName.' '.$this->lastName.' '.$this->patronymic);
     }
-
-    public function __toString(): string
-    {
-        return $this->getFullName();
-    }
-
 }
