@@ -1,6 +1,8 @@
 twig:
     file_name_pattern: '*.twig'
     form_themes: [ 'bootstrap_5_layout.html.twig' ]
+    globals:
+        book_covers_directory: 'uploads/images/book_covers'
 
 when@test:
     twig:

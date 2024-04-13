@@ -47,6 +47,9 @@ class Book
     #[ORM\ManyToMany(targetEntity: Author::class, mappedBy: 'books')]
     private Collection $authors;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $coverFilename = null;
+
     public function __construct()
     {
         $this->authors = new ArrayCollection();
@@ -123,5 +126,17 @@ class Book
     public function __toString(): string
     {
         return sprintf("%s (%s)", $this->title, $this->year);
+    }
+
+    public function getCoverFilename(): ?string
+    {
+        return $this->coverFilename;
+    }
+
+    public function setCoverFilename(?string $coverFilename): static
+    {
+        $this->coverFilename = $coverFilename;
+
+        return $this;
     }
 }

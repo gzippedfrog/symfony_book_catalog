@@ -18,9 +18,11 @@ class AuthorType extends AbstractType
             ->add('firstName')
             ->add('lastName')
             ->add('patronymic', TextType::class, [
+                'label'    => 'Patronimic (optional)',
                 'required' => false,
             ])
             ->add('books', EntityType::class, [
+                'label'    => 'Books (optional)',
                 'class'    => Book::class,
                 'multiple' => true,
                 'required' => false,

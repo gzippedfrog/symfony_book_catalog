@@ -3,14 +3,16 @@
 namespace App\Controller;
 
 use App\Entity\Book;
-use App\Entity\Post;
 use App\Form\BookType;
 use App\Repository\BookRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/book', 'admin_book_')]
 class BookController extends AbstractController
@@ -28,7 +30,7 @@ class BookController extends AbstractController
     }
 
     #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
-    public function new(Request $request): Response
+    public function new(Request $request, SluggerInterface $slugger): Response
     {
         $book = new Book();
 
@@ -36,6 +38,27 @@ class BookController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $coverImage */
+            $coverImage = $form->get('coverImage')->getData();
+
+            if ($coverImage) {
+                $originalFilename = pathinfo($coverImage->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$coverImage->guessExtension();
+
+                try {
+                    $coverImage->move(
+                        $this->getParameter('book_covers_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                    throw $e;
+                }
+
+                $book->setCoverFilename($newFilename);
+            }
+
             $this->entityManager->persist($book);
             $this->entityManager->flush();
 
@@ -48,12 +71,33 @@ class BookController extends AbstractController
     }
 
     #[Route('/{id<\d+>}/edit', name: 'edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Book $book): Response
+    public function edit(Request $request, SluggerInterface $slugger, Book $book): Response
     {
         $form = $this->createForm(BookType::class, $book);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $coverImage */
+            $coverImage = $form->get('coverImage')->getData();
+
+            if ($coverImage) {
+                $originalFilename = pathinfo($coverImage->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$coverImage->guessExtension();
+
+                try {
+                    $coverImage->move(
+                        $this->getParameter('book_covers_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                    throw $e;
+                }
+
+                $book->setCoverFilename($newFilename);
+            }
+
             $this->entityManager->persist($book);
             $this->entityManager->flush();
 

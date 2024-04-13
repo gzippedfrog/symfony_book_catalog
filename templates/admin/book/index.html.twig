@@ -13,6 +13,7 @@
                 <th scope="col">Year</th>
                 <th scope="col">ISBN</th>
                 <th scope="col">Authors</th>
+                <th scope="col">Cover</th>
                 <th scope="col">Actions</th>
             </tr>
             </thead>
@@ -24,6 +25,10 @@
                     <td>{{ book.year }}</td>
                     <td>{{ book.isbn }}</td>
                     <td>{{ book.authors.count > 0 ? book.authors|join('; ') : '-' }}</td>
+                    <td>
+                        <img src="/{{ book_covers_directory ~ '/' ~ book.coverFilename }}" alt="book cover"
+                             style="max-height: 100px">
+                    </td>
                     <td>
                         <div class="d-flex">
                             <a href="{{ path('admin_book_edit', {id: book.id}) }}" class="btn btn-sm btn-primary">
