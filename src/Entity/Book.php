@@ -6,9 +6,14 @@ use App\Repository\BookRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: BookRepository::class)]
+#[ORM\UniqueConstraint(columns: ["title", "isbn"])]
+#[ORM\UniqueConstraint(columns: ["title", "year"])]
+#[UniqueEntity(fields: ["title", "isbn"], message: "Book with this title and ISBN combination already exist.")]
+#[UniqueEntity(fields: ["title", "year"], message: "Book with this title and year combination already exist.")]
 class Book
 {
     #[ORM\Id]
@@ -21,15 +26,19 @@ class Book
     #[Assert\Length(
         min: 2,
         max: 255,
-        minMessage: "The book's title must be between 2 and 255",
-        maxMessage: "The book's title must be between 2 and 255"
+        minMessage: "The book's title must be between 2 and 255.",
+        maxMessage: "The book's title must be between 2 and 255."
     )]
     private ?string $title = null;
 
     #[ORM\Column(length: 4)]
+    #[Assert\NotBlank(message: "The book's year must not be empty.")]
+    #[Assert\GreaterThan(0, message: "The book's year must be greater than 0.")]
     private ?string $year = null;
 
-    #[ORM\Column(length: 13)]
+    #[ORM\Column(length: 17)]
+    #[Assert\NotBlank(message: "The book's ISBN must not be empty.")]
+    #[Assert\Isbn]
     private ?string $isbn = null;
 
     /**
@@ -109,5 +118,10 @@ class Book
         }
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return sprintf("%s (%s)", $this->title, $this->year);
     }
 }

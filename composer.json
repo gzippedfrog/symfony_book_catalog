@@ -1,4 +1,6 @@
 {
+    "name": "gzippedfrog/symfony_book_catalog",
+    "description": "test task for a symfony developer position",
     "type": "project",
     "license": "proprietary",
     "minimum-stability": "stable",

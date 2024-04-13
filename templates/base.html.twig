@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Welcome!{% endblock %}</title>
@@ -19,6 +19,18 @@
     {% endblock %}
 </head>
 <body>
+
+<header class="d-flex justify-content-center py-3">
+    <ul class="nav nav-pills">
+        <li class="nav-item">
+            <a href="{{ path('admin_book_index') }}" class="nav-link" aria-current="page">Books</a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ path('admin_author_index') }}" class="nav-link" aria-current="page">Authors</a>
+        </li>
+    </ul>
+</header>
+
 <div class="container">
     {% block body %}{% endblock %}
 </div>

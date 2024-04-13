@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Book;
+use App\Entity\Post;
 use App\Form\BookType;
 use App\Repository\BookRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -10,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/book')]
 class BookController extends AbstractController
@@ -53,12 +55,21 @@ class BookController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('admin_book_edit', ['id' => $book->getId()], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('admin_book_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('admin/book/edit.html.twig', [
             'book' => $book,
             'form' => $form,
         ]);
+    }
+
+    #[Route('/{id<\d+>}/delete', name: 'admin_book_delete', methods: ['POST'])]
+    public function delete(Request $request, Book $book, EntityManagerInterface $entityManager): Response
+    {
+        $entityManager->remove($book);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('admin_book_index', [], Response::HTTP_SEE_OTHER);
     }
 }

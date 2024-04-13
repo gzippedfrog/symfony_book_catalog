@@ -23,9 +23,16 @@
                     <td>{{ book.year }}</td>
                     <td>{{ book.isbn }}</td>
                     <td>
-                        <a href="{{ path('admin_book_edit', {id: book.id}) }}" class="btn btn-sm btn-primary">
-                            Edit
-                        </a>
+                        <div class="d-flex">
+                            <a href="{{ path('admin_book_edit', {id: book.id}) }}" class="btn btn-sm btn-primary">
+                                Edit
+                            </a>
+
+                            <form action="{{ url('admin_book_delete', {id: book.id}) }}" method="POST" class="ms-2">
+                                <input type="hidden" name="token" value="{{ csrf_token('delete') }}"/>
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
             {% endfor %}

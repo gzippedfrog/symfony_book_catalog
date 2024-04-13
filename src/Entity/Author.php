@@ -6,8 +6,16 @@ use App\Repository\AuthorRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AuthorRepository::class)]
+#[ORM\UniqueConstraint(columns: ["first_name", "last_name", "patronymic"])]
+#[UniqueEntity(fields: [
+    "first_name",
+    "last_name",
+    "patronymic",
+], message: "Author with this first name, last name and patronymic combination already exist.")]
 class Author
 {
     #[ORM\Id]
@@ -16,12 +24,32 @@ class Author
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "The author's first name must not be empty.")]
+    #[Assert\Length(
+        min: 2,
+        max: 255,
+        minMessage: "The author's first name must be between 2 and 255 characters long.",
+        maxMessage: "The author's first name must be between 2 and 255 characters long."
+    )]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "The author's last name must not be empty.")]
+    #[Assert\Length(
+        min: 2,
+        max: 255,
+        minMessage: "The author's last name must be between 2 and 255 characters long.",
+        maxMessage: "The author's last name must be between 2 and 255 characters long."
+    )]
     private ?string $lastName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(
+        min: 2,
+        max: 255,
+        minMessage: "The author's patronymic must be between 2 and 255 characters long.",
+        maxMessage: "The author's patronymic must be between 2 and 255 characters long."
+    )]
     private ?string $patronymic = null;
 
     /**
@@ -99,4 +127,15 @@ class Author
 
         return $this;
     }
+
+    public function getFullName(): string
+    {
+        return trim($this->firstName.' '.$this->lastName.' '.$this->patronymic);
+    }
+
+    public function __toString(): string
+    {
+        return $this->getFullName();
+    }
+
 }
