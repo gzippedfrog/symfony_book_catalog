@@ -1,0 +1,12 @@
+{{ form_start(form) }}
+
+{{ form_widget(form) }}
+
+<button type="submit" class="btn btn-primary">
+    {{ button_label|default('Add author') }}
+</button>
+
+<a href="{{ path('admin_book_index') }}" class="btn btn-link">
+    Back to author list
+</a>
+{{ form_end(form) }}

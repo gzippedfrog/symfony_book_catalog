@@ -5,7 +5,7 @@
 {% block body %}
     <h1>Create book</h1>
 
-    {{ include('admin/book/_form.html.twig', {
+    {{ include('admin/_form.html.twig', {
         form: form,
     }, with_context = false) }}
 {% endblock %}
