@@ -7,8 +7,8 @@
 
     {{ include('admin/_form.html.twig', {
         form: form,
+        back_url: path('admin_author_index'),
+        back_label: 'Back to author list',
         submit_label: 'Update',
-        back_label: 'Back to author list'
-        back_url: path('admin_author_index')
     }, with_context = false) }}
 {% endblock %}
