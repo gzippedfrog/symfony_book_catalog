@@ -17,7 +17,10 @@ docker run \
   --rm -d --name ${APP_NAME}_db mysql:${MYSQL_VER}
 
 # Run database migrations
-symfony console doctrine:migrations:migrate --no-interaction
+symfony console doctrine:migrations:migrate -n
+
+# Run fixtures
+symfony console doctrine:fixtures:load -n
 
 # Start Symfony server in detached mode
 symfony server:start -d
