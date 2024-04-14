@@ -62,8 +62,8 @@ class AppFixtures extends Fixture
     private function getBookData(): array
     {
         return [
+            // title, year, ISBN, pages, authors
             [
-                // title, year, ISBN, pages, authors
                 'Искусство Agile-разработки. Теория и практика гибкой разработки ПО',
                 '2023',
                 '978-5-4461-2386-5',
