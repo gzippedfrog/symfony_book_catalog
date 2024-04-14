@@ -23,14 +23,13 @@ class BookType extends AbstractType
                 'label' => 'ISBN',
             ])
             ->add('authors', EntityType::class, [
-                'label'       => 'Authors (optional)',
+                'label'        => 'Authors (optional)',
                 'class'        => Author::class,
                 'multiple'     => true,
                 'by_reference' => false,
                 'required'     => false,
             ])
-            ->
-            add('coverImage', FileType::class, [
+            ->add('coverImage', FileType::class, [
                 'label'       => 'Cover image (optional)',
                 'mapped'      => false,
                 'required'    => false,

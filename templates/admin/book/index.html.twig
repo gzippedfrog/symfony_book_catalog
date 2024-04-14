@@ -26,8 +26,10 @@
                     <td>{{ book.isbn }}</td>
                     <td>{{ book.authors.count > 0 ? book.authors|join('; ') : '-' }}</td>
                     <td>
-                        <img src="/{{ book_covers_directory ~ '/' ~ book.coverFilename }}" alt="book cover"
-                             style="max-height: 100px">
+                        <a href="{{ asset('uploads/images/book_covers/' ~ book.coverFilename) }}" target="_blank">
+                            <img src="{{ asset('uploads/images/book_covers/' ~ book.coverFilename) }}" alt="book cover"
+                                 style="max-height: 100px">
+                        </a>
                     </td>
                     <td>
                         <div class="d-flex">

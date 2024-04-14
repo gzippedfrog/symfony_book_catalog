@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Book;
 use App\Form\BookType;
 use App\Repository\BookRepository;
+use App\Service\FileUploader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
@@ -13,14 +14,12 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/book', 'admin_book_')]
 class BookController extends AbstractController
 {
     function __construct(
         private EntityManagerInterface $entityManager,
-        private SluggerInterface $slugger
     ) {
     }
 
@@ -33,7 +32,7 @@ class BookController extends AbstractController
     }
 
     #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
-    public function new(Request $request): Response
+    public function new(Request $request, FileUploader $fileUploader): Response
     {
         $book = new Book();
 
@@ -45,17 +44,16 @@ class BookController extends AbstractController
             $coverImage = $form->get('coverImage')->getData();
 
             if ($coverImage) {
-                $fileName = $this->uploadBookCover($coverImage);
-
-                if (false === $fileName) {
+                try {
+                    $coverFilename = $fileUploader->upload($coverImage);
+                    $book->setCoverFilename($coverFilename);
+                } catch (FileException) {
                     $form->get('coverImage')->addError(new FormError('There was an error uploading image file.'));
 
                     return $this->render('admin/book/new.html.twig', [
                         'form' => $form,
                     ]);
                 }
-
-                $book->setCoverFilename($fileName);
             }
 
             $this->entityManager->persist($book);
@@ -70,7 +68,7 @@ class BookController extends AbstractController
     }
 
     #[Route('/{id<\d+>}/edit', name: 'edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Book $book): Response
+    public function edit(Request $request, Book $book, FileUploader $fileUploader): Response
     {
         $form = $this->createForm(BookType::class, $book);
         $form->handleRequest($request);
@@ -80,9 +78,10 @@ class BookController extends AbstractController
             $coverImage = $form->get('coverImage')->getData();
 
             if ($coverImage) {
-                $fileName = $this->uploadBookCover($coverImage);
-
-                if (false === $fileName) {
+                try {
+                    $coverFilename = $fileUploader->upload($coverImage);
+                    $book->setCoverFilename($coverFilename);
+                } catch (FileException) {
                     $form->get('coverImage')->addError(new FormError('There was an error uploading image file.'));
 
                     return $this->render('admin/book/edit.html.twig', [
@@ -90,8 +89,6 @@ class BookController extends AbstractController
                         'form' => $form,
                     ]);
                 }
-
-                $book->setCoverFilename($fileName);
             }
 
             $this->entityManager->persist($book);
@@ -113,20 +110,5 @@ class BookController extends AbstractController
         $this->entityManager->flush();
 
         return $this->redirectToRoute('admin_book_index', [], Response::HTTP_SEE_OTHER);
-    }
-
-    private function uploadBookCover(UploadedFile $coverImage): string|false
-    {
-        $originalFilename = pathinfo($coverImage->getClientOriginalName(), PATHINFO_FILENAME);
-        $safeFilename = $this->slugger->slug($originalFilename);
-        $newFilename = $safeFilename.'-'.uniqid().'.'.$coverImage->guessExtension();
-
-        try {
-            $coverImage->move($this->getParameter('book_covers_directory'), $newFilename);
-        } catch (FileException $e) {
-            return false;
-        }
-
-        return $newFilename;
     }
 }
