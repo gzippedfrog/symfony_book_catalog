@@ -14,7 +14,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[UniqueEntity(
     fields: ["firstName", "lastName", "patronymic"],
     message: "Author with this first name, last name and patronymic combination already exist.",
-    ignoreNull: 'patronymic'
 )]
 class Author
 {
@@ -43,7 +42,8 @@ class Author
     )]
     private ?string $lastName = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "The author's patronymic must not be empty.")]
     #[Assert\Length(
         min: 2,
         max: 255,
