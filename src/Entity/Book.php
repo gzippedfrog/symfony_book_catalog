@@ -50,6 +50,11 @@ class Book
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $coverFilename = null;
 
+    #[ORM\Column(nullable: false)]
+    #[Assert\NotBlank(message: "The book's pages must not be empty.")]
+    #[Assert\GreaterThan(0, message: "The book's pages must be greater than 0.")]
+    private ?int $pages = null;
+
     public function __construct()
     {
         $this->authors = new ArrayCollection();
@@ -136,6 +141,18 @@ class Book
     public function setCoverFilename(?string $coverFilename): static
     {
         $this->coverFilename = $coverFilename;
+
+        return $this;
+    }
+
+    public function getPages(): ?int
+    {
+        return $this->pages;
+    }
+
+    public function setPages(int $pages): static
+    {
+        $this->pages = $pages;
 
         return $this;
     }

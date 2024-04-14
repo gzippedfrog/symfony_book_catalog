@@ -22,8 +22,13 @@
                 <tr>
                     <td>{{ author.firstName }}</td>
                     <td>{{ author.lastName }}</td>
-                    <td>{{ author.patronymic ? author.patronymic : '-' }}</td>
-                    <td>{{ author.books.count > 0 ? author.books|join('; ') : '-' }}</td>
+                    <td>{{ author.patronymic }}</td>
+                    <td>
+                        {% for book in author.books %}
+                            <a href="{{ path('admin_book_edit', {id: book.id}) }}" class="d-block"
+                               style="min-width: max-content">{{ book }}</a>
+                        {% endfor %}
+                    </td>
                     <td>
                         <div class="d-flex">
                             <a href="{{ path('admin_author_edit', {id: author.id}) }}" class="btn btn-sm btn-primary">

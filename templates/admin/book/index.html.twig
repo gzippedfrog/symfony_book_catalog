@@ -24,12 +24,20 @@
                     <td>{{ book.title }}</td>
                     <td>{{ book.year }}</td>
                     <td>{{ book.isbn }}</td>
-                    <td>{{ book.authors.count > 0 ? book.authors|join('; ') : '-' }}</td>
                     <td>
-                        <a href="{{ asset('uploads/images/book_covers/' ~ book.coverFilename) }}" target="_blank">
-                            <img src="{{ asset('uploads/images/book_covers/' ~ book.coverFilename) }}" alt="book cover"
-                                 style="max-height: 100px">
-                        </a>
+                        {% for author in book.authors %}
+                            <a href="{{ path('admin_author_edit', {id: author.id}) }}" class="d-block"
+                               style="min-width: max-content">{{ author }}</a>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% if book.coverFilename %}
+                            <a href="{{ asset('uploads/images/book_covers/' ~ book.coverFilename) }}" target="_blank">
+                                <img src="{{ asset('uploads/images/book_covers/' ~ book.coverFilename) }}"
+                                     alt="book cover"
+                                     style="max-height: 100px">
+                            </a>
+                        {% endif %}
                     </td>
                     <td>
                         <div class="d-flex">

@@ -22,6 +22,7 @@ class BookType extends AbstractType
             ->add('isbn', TextType::class, [
                 'label' => 'ISBN',
             ])
+            ->add('pages')
             ->add('authors', EntityType::class, [
                 'label'        => 'Authors (optional)',
                 'class'        => Author::class,
