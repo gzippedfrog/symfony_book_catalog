@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [[ ! -f .env ]]; then
+  cp .env.example .env
+fi
+
 # Source environment variables
 source .env
 
