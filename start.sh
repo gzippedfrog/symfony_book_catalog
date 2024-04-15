@@ -16,11 +16,21 @@ docker run \
   -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} \
   --rm -d --name ${APP_NAME}_db mysql:${MYSQL_VER}
 
-# Run database migrations
-symfony console doctrine:migrations:migrate -n
+## Run database migrations
+echo "trying to execute migrations..."
 
-# Run fixtures
+symfony console doctrine:migrations:migrate -n
+status=$?
+
+while [ $status -ne 0 ]; do
+  sleep 5
+  symfony console doctrine:migrations:migrate -n
+  status=$?
+done
+
+## Run fixtures
+echo "executing fixtures..."
 symfony console doctrine:fixtures:load -n
 
-# Start Symfony server in detached mode
+## Start Symfony server in detached mode
 symfony server:start -d
