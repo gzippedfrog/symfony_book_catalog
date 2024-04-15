@@ -2,9 +2,15 @@
 
 Тестовое задание для PHP symfony developer
 
+## Требования
+
+- php `>=8.1.8`
+- composer
+- symfony-cli
+- docker
+
 ## Как запустить
 
 ```bash
-cp .env.example .env 
 bash start.sh
 ```
