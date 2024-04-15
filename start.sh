@@ -24,12 +24,10 @@ docker run \
 echo "trying to execute migrations..."
 
 symfony console doctrine:migrations:migrate -n
-status=$?
 
-while [ $status -ne 0 ]; do
+while [ $? -ne 0 ]; do
   sleep 5
   symfony console doctrine:migrations:migrate -n
-  status=$?
 done
 
 ## Run fixtures
